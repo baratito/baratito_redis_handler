@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  redis_handler:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/src
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PASSWORD: "420piedrabuena"
+      REDIS_PORT: "6379"
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server --requirepass 420piedrabuena
+    ports:
+      - "6379:6379"
+    volumes:
+      - $PWD/redis-data:/var/lib/redis
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    restart: always

@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "baratito_redis_handler"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+redis = "^3.5.3"
+structlog = "^21.1.0"
+psycopg2-binary = "^2.9.1"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.9.1"
+black = "^21.6b0"
+flake8 = "^3.9.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
