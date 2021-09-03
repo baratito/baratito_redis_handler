@@ -26,7 +26,7 @@ def get_db_session():
         conn = connect(dbname=DB_NAME, user=DB_USER, host=DB_HOST, password=DB_PASS, port=DB_PORT)
         return conn
     except Exception as err:
-        logger.error("\npsycopg2 error:", err)
+        logger.error(f"\npsycopg2 error:{err}")
 
 
 import json
