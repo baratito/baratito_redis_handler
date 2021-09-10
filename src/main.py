@@ -35,12 +35,12 @@ import json
 def product_handler(message):
     logger.info(f"processing product {message}")
     product = json.loads(message.get("data").decode("UTF-8"))
-    id = product["id"]
     name = product["nombre"]
     presentation = product["presentacion"]
     brand = product["marca"]
-    data = (id, name, presentation, brand)
-    query = "INSERT INTO product(id, name, presentation, brand, max_price, min_price) VALUES (%s, %s, %s, %s, 0, 0);"
+    external_id = product["id"]
+    data = (name, presentation, brand, external_id)
+    query = "INSERT INTO product(name, presentation, brand, max_price, min_price, external_id) VALUES (%s, %s, %s, 0, 0, %s);"
     conn = get_db_session()
     cursor = conn.cursor()
     try:
@@ -56,6 +56,39 @@ def product_handler(message):
 
 def site_handler(message):
     logger.info(f"site {message}")
+    establishment = json.loads(message.get("data").decode("UTF-8"))
+    external_id = establishment["id"]
+    establishment_type = establishment["sucursalTipo"]
+    address = establishment["direccion"]
+    county = establishment["localidad"]
+    brand = establishment["banderaDescripcion"]
+    latitude = establishment["lat"]
+    longitude = establishment["lng"]
+    name = establishment["sucursalNombre"]
+
+    location = f"POINT({longitude} {latitude})"
+    data = (
+        name,
+        establishment_type,
+        address,
+        county,
+        latitude,
+        longitude,
+        brand,
+        external_id,
+        location,
+    )
+    query = "INSERT INTO establishment(name, establishment_type, address, county, latitude, longitude, brand, external_id, location) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    conn = get_db_session()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(query, data)
+    except Exception as err:
+        logger.error(f"cursor.execute() ERROR: {err}")
+        conn.rollback()
+
+    conn.commit()
+    conn.close()
 
 
 subscriptions = {
