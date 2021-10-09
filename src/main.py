@@ -91,9 +91,31 @@ def site_handler(message):
     conn.close()
 
 
+def category_handler(message):
+    logger.info(f"category {message}")
+    product_category = json.loads(message.get("data").decode("UTF-8"))
+
+    product_external_id = product_category["id"]
+    category_ids = product_category["category"]
+    category_id = category_ids.split("-")[0]
+    data = (product_external_id, category_id)
+    query = "INSERT INTO category_product(product_id, category_id) VALUES ((SELECT id FROM product WHERE external_id=%s), (SELECT ID FROM category where external_id=%s));"
+    conn = get_db_session()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(query, data)
+    except Exception as err:
+        logger.error(f"cursor.execute() ERROR: {err}")
+        conn.rollback()
+
+    conn.commit()
+    conn.close()
+
+
 subscriptions = {
     "product": product_handler,
     "site": site_handler,
+    "category": category_handler,
 }
 
 logger.info("starting handlers")
