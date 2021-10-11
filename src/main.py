@@ -39,8 +39,9 @@ def product_handler(message):
     presentation = product["presentacion"]
     brand = product["marca"]
     external_id = product["id"]
-    data = (name, presentation, brand, external_id)
-    query = "INSERT INTO product(name, presentation, brand, max_price, min_price, external_id) VALUES (%s, %s, %s, 0, 0, %s);"
+    photo = f"https://imagenes.preciosclaros.gob.ar/productos/{external_id}.jpg"
+    data = (name, presentation, brand, external_id, photo)
+    query = "INSERT INTO product(name, presentation, brand, max_price, min_price, external_id, photo) VALUES (%s, %s, %s, 0, 0, %s, %s);"
     conn = get_db_session()
     cursor = conn.cursor()
     try:
