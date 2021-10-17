@@ -1,3 +1,5 @@
+import datetime
+
 import redis
 from psycopg2 import connect, sql
 from structlog import get_logger
@@ -113,10 +115,33 @@ def category_handler(message):
     conn.close()
 
 
+def product_price_handler(message):
+    logger.info(f"processing product price {message}")
+    product_price = json.loads(message.get("data").decode("UTF-8"))
+    price = product_price["precio"]
+    establishment_id = product_price["sucursal_id"]
+    product_id = product_price["producto_id"]
+    created_date = str(datetime.datetime.utcnow())
+    data = (price, product_id, establishment_id, created_date)
+    query = "INSERT INTO public.product_price(price, product_id, establishment_id, created_date) VALUES  (%s, (SELECT id FROM product WHERE external_id=%s), (SELECT id FROM establishment WHERE external_id=%s), %s);"
+    conn = get_db_session()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(query, data)
+
+    except Exception as err:
+        logger.error(f"cursor.execute() ERROR: {err}")
+        conn.rollback()
+
+    conn.commit()
+    conn.close()
+
+
 subscriptions = {
     "product": product_handler,
     "site": site_handler,
     "category": category_handler,
+    "product_price": product_price_handler,
 }
 
 logger.info("starting handlers")
